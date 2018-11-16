@@ -11,6 +11,15 @@ import java.util.jar.JarInputStream;
 public class Main extends JFrame {
     private String[] text = {"<-", "CE", "C", "+/-", "7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ",", "+", "="};
 
+    public static void main(String[] args){
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Main();
+            }
+        });
+    }
+
     public Main() {
         super("Kalkulator");
 
