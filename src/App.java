@@ -7,10 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class App extends JFrame {
-    private String[] text = {"<=", "CE", "C", "+/-", "7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ",", "+", "="};
-    private  List<Double> values= new ArrayList<Double>() ;
-    private static  List<String> actions = new ArrayList<String>();
-
+    private String[] text = {"<=", "CE", "C", "+/-", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "sqrt", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
+    // working: <=, CE, C, +/-, numbers, /, *, x^2, +, =, sqrt, x^n
+    //not working: (, ), ","
     public App() {
         super("Kalkulator");
 
@@ -20,7 +19,7 @@ public class App extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setVisible(true);
-        setSize(300, 500);
+        setSize(350, 500);
 
         Input input = new Input();                      //creating input and add to top layout
         input.setSize(300, 100);
@@ -28,7 +27,7 @@ public class App extends JFrame {
 
         List<Button> buttons = new ArrayList<Button>();      //button list
         for (int i = 0; i < text.length; i++) {
-            buttons.add(new Button(text[i], input, this));    //creating a buttons and put into list
+            buttons.add(new Button(text[i], input));    //creating a buttons and put into list
         }
         for (Button b : buttons) {
             main.add(b);                //add to layout
@@ -37,60 +36,23 @@ public class App extends JFrame {
         body.add(main, BorderLayout.CENTER);
         getContentPane().add(body);
     }
-
-    public void addValue(double value) {
-        values.add(value);
-    }
-
-    public double getValue(int index) {
-        return values.get(index);
-    }
-
-    public static void setAction(String action) {
-        actions.add(action);
-    }
-
-    private static String getAction() {
-        int priority = 0;
-        String action = "";
-        for (String a : actions) {
-            if (a.equals("*") || a.equals("/") && priority <= 1) {
-                priority++;
-                action = a;
-            } else if (priority == 0) {
-                priority++;
-                action = a;
-            }
-        }
-        if (action.equals("")) return "";
-        else return action;
-    }
-
-    public double calculate() {                                 //zrobic obsluge bledow
-        String action = App.getAction();
-        double result = values.get(actions.indexOf(action));
-        double val1 = values.get(actions.indexOf(action));
-        double val2 = values.get(actions.indexOf(action) + 1);
-        switch (action) {
-            case "*": {
-                result = val1 * val2;
-            }
-            break;
-            case "+": {
-                result = val1 + val2;
-            }
-            break;
-        }
-        values.remove(actions.indexOf(action) + 1);
-        values.remove(actions.indexOf(action));
-        values.add(actions.indexOf(action), result);
-        actions.remove(actions.indexOf(action));
-        return result;
-    }
 }
 
 class Button extends JButton {
-    public Button(String text, Input input, App app) {
+    private static List<Operations> operacje = new ArrayList<Operations>();
+    private static int operationDegree = 0;
+
+    public Operations getOperations() {
+        if (operacje.size() < operationDegree + 1) operacje.add(new Operations());
+        return operacje.get(operationDegree);
+    }
+
+    public void removeOperation() {
+        if (operacje.size() < operationDegree + 1) operacje.add(new Operations());
+        else operacje.remove(operationDegree);
+    }
+
+    public Button(String text, Input input) {
         super(text);
         addActionListener(new ActionListener() {
             @Override
@@ -124,6 +86,7 @@ class Button extends JButton {
                         break;
                         case "CE": {
                             value = "0";
+                            operacje = new ArrayList<Operations>();
                         }
                         break;
                         case "C": {
@@ -135,27 +98,57 @@ class Button extends JButton {
                         }
                         break;
                         case "+": {
-                            app.addValue(val);
-                            App.setAction("+");
+                            getOperations().addValue(val);
+                            getOperations().setAction("+");
+                            value = "0";
+                        }
+                        break;
+                        case "-": {
+                            getOperations().addValue(val);
+                            getOperations().setAction("-");
                             value = "0";
                         }
                         break;
                         case "*": {
-                            app.addValue(val);
-                            App.setAction("*");
+                            getOperations().addValue(val);
+                            getOperations().setAction("*");
+                            value = "0";
+                        }
+                        break;
+                        case "/": {
+                            getOperations().addValue(val);
+                            getOperations().setAction("/");
                             value = "0";
                         }
                         break;
                         case "=": {
-                            app.addValue(val);
-                            val = app.calculate();
+                            getOperations().addValue(val);
+                            val = getOperations().calculate(val);
+                            removeOperation();
+
+                        }
+                        break;
+                        case "x^2":{
+                            val=Operations.pow(val,2);
+                        }break;
+                        case "sqrt":{
+                            getOperations().addValue(val);
+                            getOperations().setAction("sqrt");
+                            value = "0";
+                        }
+                        break;
+                        case "x^n":{
+                            getOperations().addValue(val);
+                            getOperations().setAction("x^n");
+                            value = "0";
                         }
                         break;
                     }
                     if (cvalue != value) {
                         val = Double.parseDouble(value);
                         input.setText(val);
-                    }input.setText(val);
+                    }
+                    input.setText(val);
 
                 } else {
                     try {
