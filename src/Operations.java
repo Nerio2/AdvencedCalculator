@@ -5,9 +5,7 @@ public class Operations {
     private List<Double> values = new ArrayList<Double>();
     private List<String> actions = new ArrayList<String>();
 
-    public void addValue(double value) {
-        values.add(value);
-    }
+    public void addValue(double value) { values.add(value); }
 
     public double getValue(int index) {
         return values.get(index);
@@ -22,11 +20,10 @@ public class Operations {
         if (actions.size() > 0) {
             int priority = 0;
             for (String a : actions) {
-                if(a.equals("sqrt")||a.equals("x^n")&& priority <=2){
-                    priority++;
-                    action=a;
-                }
-                else if (a.equals("*") || a.equals("/") && priority <= 1) {
+                if (a.equals("sqrt") || a.equals("x^n") && priority <= 2) {
+                    priority+=2;
+                    action = a;
+                } else if (a.equals("*") || a.equals("/") && priority <= 1) {
                     priority++;
                     action = a;
                 } else if (priority == 0) {
@@ -42,7 +39,6 @@ public class Operations {
         if (values.size() >= 2) {
             double result = 0;
             while (values.size() >= 2) {
-
                 String action = getAction();
                 result = values.get(actions.indexOf(action));
                 double val1 = values.get(actions.indexOf(action));
@@ -64,12 +60,12 @@ public class Operations {
                         result = sub(val1, val2);
                     }
                     break;
-                    case "sqrt":{
-                        result=sqrt(val1, val2);
+                    case "sqrt": {
+                        result = sqrt(val1, val2);
                     }
                     break;
-                    case "x^n":{
-                        result=pow(val1,val2);
+                    case "x^n": {
+                        result = pow(val1, val2);
                     }
                     break;
                 }

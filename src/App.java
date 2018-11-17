@@ -2,14 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends JFrame {
     private String[] text = {"<=", "CE", "C", "+/-", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "sqrt", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
     // working: <=, CE, C, +/-, numbers, /, *, x^2, +, =, sqrt, x^n
-    //not working: (, ), ","
+    // not working: (, ), ","
     public App() {
         super("Kalkulator");
 
@@ -77,11 +76,13 @@ class Button extends JButton {
                 if (action == -1) {
                     switch (getText()) {
                         case "<=": {
-                            if (value.length() > 1 && value.indexOf('-') == -1)
-                                value = value.substring(0, value.length() - 1);
-                            else if (value.length() > 2 && value.indexOf('-') != -1)
-                                value = value.substring(0, value.length() - 1);
-                            else value = "0";
+                            if ((long) val == val) {
+                                if (value.length() > 1 && value.indexOf('-') == -1)
+                                    value = value.substring(0, value.length() - 1);
+                                else if (value.length() > 2 && value.indexOf('-') != -1)
+                                    value = value.substring(0, value.length() - 1);
+                                else value = "0";
+                            }
                         }
                         break;
                         case "CE": {
@@ -125,7 +126,6 @@ class Button extends JButton {
                             getOperations().addValue(val);
                             val = getOperations().calculate(val);
                             removeOperation();
-
                         }
                         break;
                         case "x^2":{
