@@ -7,6 +7,7 @@ public class Operations {
 
     public void addValue(double value) { values.add(value); }
 
+
     public double getValue(int index) {
         return values.get(index);
     }

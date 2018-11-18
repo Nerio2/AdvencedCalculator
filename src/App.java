@@ -2,13 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends JFrame {
     private String[] text = {"<=", "CE", "C", "+/-", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "sqrt", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
-    // working: <=, CE, C, +/-, numbers, /, *, x^2, +, =, sqrt, x^n
-    // not working: (, ), ","
+    // working: <=, CE, C, +/-, numbers, /, *, x^2, +, =, sqrt, x^n, (, ),
+    // not working:  ","
     public App() {
         super("Kalkulator");
 
@@ -42,13 +43,19 @@ class Button extends JButton {
     private static int operationDegree = 0;
 
     public Operations getOperations() {
-        if (operacje.size() < operationDegree + 1) operacje.add(new Operations());
+        if (operacje.size() < operationDegree + 1) operacje.add(operationDegree, new Operations());
         return operacje.get(operationDegree);
     }
+    public Operations getOperations(int degree) {
+        return operacje.get(degree);
+    }
 
-    public void removeOperation() {
-        if (operacje.size() < operationDegree + 1) operacje.add(new Operations());
-        else operacje.remove(operationDegree);
+    public void removeOperation(int degree) {
+        operacje.remove(degree);
+    }
+    public void resetOperations(){
+        operacje = new ArrayList<Operations>();
+        operationDegree=0;
     }
 
     public Button(String text, Input input) {
@@ -87,7 +94,7 @@ class Button extends JButton {
                         break;
                         case "CE": {
                             value = "0";
-                            operacje = new ArrayList<Operations>();
+                            resetOperations();
                         }
                         break;
                         case "C": {
@@ -125,7 +132,7 @@ class Button extends JButton {
                         case "=": {
                             getOperations().addValue(val);
                             val = getOperations().calculate(val);
-                            removeOperation();
+                            resetOperations();
                         }
                         break;
                         case "x^2":{
@@ -143,10 +150,18 @@ class Button extends JButton {
                             value = "0";
                         }
                         break;
+                        case "(":{
+                            operationDegree++;
+                        }break;
+                        case ")":{
+                            getOperations().addValue(val);
+                            operationDegree--;
+                            val=getOperations(operationDegree+1).calculate(val);
+                            removeOperation(operationDegree+1);
+                        }break;
                     }
-                    if (cvalue != value) {
+                    if (!cvalue.equals(value)) {
                         val = Double.parseDouble(value);
-                        input.setText(val);
                     }
                     input.setText(val);
 
@@ -156,7 +171,7 @@ class Button extends JButton {
                         val += val >= 0 ? action : -action;
                         input.setText(val);
                     } catch (NumberFormatException x) {
-                        ;
+                        input.setText("ERROR");
                     }
                 }
 
