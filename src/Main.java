@@ -11,11 +11,14 @@ import java.util.jar.JarInputStream;
 public class Main extends JFrame {
 
     public static void main(String[] args) {
+
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 new App();
             }
         });
+
+
     }
 }

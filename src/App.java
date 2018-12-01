@@ -1,17 +1,42 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends JFrame {
-    private String[] text = {"<=", "CE", "C", "+/-", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "sqrt", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
-    // working: <=, CE, C, +/-, numbers, /, *, x^2, +, = , sqrt, x^n, (, )
-    // TODO: , doesnt work
-    // DONE: <= for nukbers less than 0 (with .)
-    // DONE: = without closed brackets
-    // TODO: better look for user like (2+3-6)
+    private String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
+    /*
+     * 1. State: In testing right now.
+     * 2. efficiency: All should work.
+     * 3. What's next?:
+     * - Keyboard input support (without clicking on input file);
+     * - File input support;
+     * - Extends for functions and calculating value for "x";
+     *
+     */
+    private List<Operations> operacje = new ArrayList<>();
+    private int operationDegree = 0;
+
+    private Operations getOperations() {
+        if (operacje.size() < operationDegree + 1) operacje.add(operationDegree, new Operations());
+        return getOperations(operationDegree);
+    }
+
+    private Operations getOperations(int degree) {
+        return operacje.get(degree);
+    }
+
+    private void removeOperation(int degree) {
+        operacje.remove(degree);
+    }
+
+    public void resetOperations() {
+        operacje = new ArrayList<>();
+        operationDegree = 0;
+    }
 
     public App() {
         super("Kalkulator");
@@ -30,7 +55,7 @@ public class App extends JFrame {
 
         List<Button> buttons = new ArrayList<>();      //button list
         for (String txt : text) {
-            buttons.add(new Button(txt, input));    //creating a buttons and put into list
+            buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
         }
         for (Button b : buttons) {
             main.add(b);                //add to layout
@@ -39,149 +64,173 @@ public class App extends JFrame {
         body.add(main, BorderLayout.CENTER);
         getContentPane().add(body);
     }
+
+    public String calc(String inputVal) {
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new StringReader(inputVal));
+            String readData;
+            String currentVal = "";
+            int read;
+            while ((read = reader.read()) != -1) {
+                readData = String.valueOf((char) read);
+                switch (readData) {
+                    case ",":
+                    case ".": {
+                        if (currentVal.equals(")")) {
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        } else currentVal += ".";
+                    }
+                    break;
+                    case "e":
+                    case "π":
+                    case "0":
+                    case "1":
+                    case "2":
+                    case "3":
+                    case "4":
+                    case "5":
+                    case "6":
+                    case "7":
+                    case "8":
+                    case "9": {
+                        if (currentVal.equals(")")) {
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        }
+                        if (readData.equals("e") && !currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        } else if (currentVal.equals("e")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        }
+                        if (readData.equals("π") && !currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        } else if (currentVal.equals("π")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        }
+                        currentVal += readData;
+                    }
+                    break;
+                    case "-":
+                        if (currentVal.equals("")) {
+                            currentVal = "-";
+                        }
+                    case "+":
+                    case "*":
+                    case "/":
+                    case "^": {
+                        if (!currentVal.equals("") && !currentVal.equals("-")) {
+                            if (!currentVal.equals(")"))
+                                getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction(readData);
+                        }
+                    }
+                    break;
+                    case "√": {
+                        if (!currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        }
+                        getOperations().addAction("√");
+                    }
+                    break;
+                    case "(": {
+                        if (!currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = "";
+                            getOperations().addAction("*");
+                        }
+                        operationDegree++;
+                    }
+                    break;
+                    case ")": {
+                        if (!currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                        }
+                        operationDegree--;
+                        currentVal = getOperations(operationDegree + 1).calculate();
+                        removeOperation(operationDegree + 1);
+                        if (!currentVal.equals("")) {
+                            getOperations().addValue(currentVal);
+                            currentVal = ")";
+                        }
+                    }
+                    break;
+                    default:
+                        return "ERROR unknown value: \"" + readData + "\"";
+                }
+            }
+            if (!currentVal.equals("")) {
+                getOperations().addValue(currentVal);
+                currentVal = "";
+            }
+            while (operationDegree >= 0) {
+                operationDegree--;
+                currentVal = getOperations(operationDegree + 1).calculate();
+                removeOperation(operationDegree + 1);
+            }
+            resetOperations();
+            return currentVal;
+        } catch (IOException x) {
+            System.out.println("ERROR");
+        }
+        return "ERROR";
+    }
 }
 
 class Button extends JButton {
-    private static List<Operations> operacje = new ArrayList<>();
-    private static int operationDegree = 0;
 
-    private Operations getOperations() {
-        if (operacje.size() < operationDegree + 1) operacje.add(operationDegree, new Operations());
-        return operacje.get(operationDegree);
-    }
-    private Operations getOperations(int degree) {
-        return operacje.get(degree);
-    }
-
-    private void removeOperation(int degree) {
-        operacje.remove(degree);
-    }
-    private void resetOperations(){
-        operacje = new ArrayList<>();
-        operationDegree=0;
-    }
-
-    public Button(String text, Input input) {
+    public Button(String text, Input input, App app) {
         super(text);
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int action = -1;         //button
-                double val = -1;     //current number value in input
-                String value = "";    //current String value in input
-                String cvalue = value;  //to check if something has changed
-                try {
-                    action = Integer.parseInt(getText());
-                } catch (NumberFormatException x) {
-                    System.out.println(x);
-                } finally {
-                    value = input.getText();
-                    cvalue = value;
-                    try {
-                        val = Double.parseDouble(input.getText());
-                    } catch (NumberFormatException xx) {
-                        System.out.println(xx);
-                    }
+        addActionListener(e -> {
+            String value = input.getText();
+            switch (text) {
+                case "<=": {
+                    if (value.length() > 1 && value.indexOf('-') == -1)
+                        value = value.substring(0, value.length() - 1);
+                    else if (value.length() > 2 && value.indexOf('-') != -1)
+                        value = value.substring(0, value.length() - 1);
+                    else value = "0";
                 }
-                if (action == -1) {
-                    switch (getText()) {
-                        case "<=": {
-                            if (value.length() > 1 && value.indexOf('-') == -1)
-                                value = value.substring(0, value.length() - 1);
-                            else if (value.length() > 2 && value.indexOf('-') != -1)
-                                value = value.substring(0, value.length() - 1);
-                            else value = "0";
-                        }
-                        break;
-                        case "CE": {
-                            value = "0";
-                            resetOperations();
-                        }
-                        break;
-                        case "C": {
-                            value = "0";
-                        }
-                        break;
-                        case "+/-": {
-                            val = -val;
-                        }
-                        break;
-                        case "+": {
-                            getOperations().addValue(val);
-                            getOperations().setAction("+");
-                            value = "0";
-                        }
-                        break;
-                        case "-": {
-                            getOperations().addValue(val);
-                            getOperations().setAction("-");
-                            value = "0";
-                        }
-                        break;
-                        case "*": {
-                            getOperations().addValue(val);
-                            getOperations().setAction("*");
-                            value = "0";
-                        }
-                        break;
-                        case "/": {
-                            getOperations().addValue(val);
-                            getOperations().setAction("/");
-                            value = "0";
-                        }
-                        break;
-                        case "=": {
-                            while(operationDegree>=0) {
-                                getOperations().addValue(val);
-                                operationDegree--;
-                                val=getOperations(operationDegree+1).calculate(val);
-                                removeOperation(operationDegree+1);
-                            }
-                            resetOperations();
-                        }
-                        break;
-                        case "x^2":{
-                            val=Operations.pow(val,2);
-                        }break;
-                        case "sqrt":{
-                            getOperations().addValue(val);
-                            getOperations().setAction("sqrt");
-                            value = "0";
-                        }
-                        break;
-                        case "x^n":{
-                            getOperations().addValue(val);
-                            getOperations().setAction("x^n");
-                            value = "0";
-                        }
-                        break;
-                        case "(":{
-                            operationDegree++;
-                        }break;
-                        case ")":{
-                            getOperations().addValue(val);
-                            operationDegree--;
-                            val=getOperations(operationDegree+1).calculate(val);
-                            removeOperation(operationDegree+1);
-                        }break;
-                    }
-                    if (!cvalue.equals(value)) {
-                        val = Double.parseDouble(value);
-                    }
-                    input.setText(val);
+                break;
 
-                } else {
-                    try {
-                        val *= 10;
-                        val += val >= 0 ? action : -action;
-                        input.setText(val);
-                    } catch (NumberFormatException x) {
-                        input.setText("ERROR");
-                    }
+                case "AC": {
+                    value = "0";
+                    app.resetOperations();
                 }
-
-
+                break;
+                case "=": {
+                    value = app.calc(value);
+                }
+                break;
+                case "x^2": {
+                    value += "^2";
+                }
+                break;
+                case "x^n": {
+                    value += "^";
+                }
+                break;
+                default: {
+                    if (value.equals("0"))
+                        value = text;
+                    else
+                        value += text;
+                }
+                break;
             }
+            input.setText(value);
         });
     }
 }
@@ -190,11 +239,5 @@ class Input extends JTextField {
     public Input() {
         super();
         setText("0");
-    }
-
-    public void setText(double a) {
-        if ((long) a == a)
-            setText(String.valueOf((long) a));
-        else setText(String.valueOf(a));
     }
 }
