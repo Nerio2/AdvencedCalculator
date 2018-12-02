@@ -1,24 +1,62 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App extends JFrame {
+/*
+ * 1. State: In testing right now.
+ * 2. efficiency: should work.
+ * 3. What's next?:
+ * - File input support;
+ * - Extends for functions and calculating value for "x";
+ */
+
+/*
+ * Testing results:
+ * - double "," works, you can put number like "32,3,4"
+ * - problems with infinity (no char for that and problems with for ex. infinity*-3)
+ */
+
+public class App extends JFrame implements KeyListener {
+
     private String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
-    /*
-     * 1. State: In testing right now.
-     * 2. efficiency: All should work.
-     * 3. What's next?:
-     * - Keyboard input support (without clicking on input file);
-     * - File input support;
-     * - Extends for functions and calculating value for "x";
-     *
-     */
+    private Input input;
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
+
+    public App() {
+        super("Kalkulator");
+        addKeyListener(this);
+        setFocusable(true);
+        pack();
+        JPanel body = new JPanel(new BorderLayout());
+        JPanel top = new JPanel(new GridLayout());
+        JPanel main = new JPanel(new GridLayout(5, 4));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true);
+        setVisible(true);
+        setSize(350, 500);
+
+        input = new Input();                      //creating input and add to top layout
+        input.setSize(300, 100);
+        top.add(input);
+
+        List<Button> buttons = new ArrayList<>();      //button list
+        for (String txt : text) {
+            buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
+        }
+        for (Button b : buttons) {
+            main.add(b);                //add to layout
+        }
+        body.add(top, BorderLayout.NORTH);
+        body.add(main, BorderLayout.CENTER);
+        getContentPane().add(body);
+    }
 
     private Operations getOperations() {
         if (operacje.size() < operationDegree + 1) operacje.add(operationDegree, new Operations());
@@ -36,33 +74,6 @@ public class App extends JFrame {
     public void resetOperations() {
         operacje = new ArrayList<>();
         operationDegree = 0;
-    }
-
-    public App() {
-        super("Kalkulator");
-
-        JPanel body = new JPanel(new BorderLayout());
-        JPanel top = new JPanel(new GridLayout());
-        JPanel main = new JPanel(new GridLayout(5, 4));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(true);
-        setVisible(true);
-        setSize(350, 500);
-
-        Input input = new Input();                      //creating input and add to top layout
-        input.setSize(300, 100);
-        top.add(input);
-
-        List<Button> buttons = new ArrayList<>();      //button list
-        for (String txt : text) {
-            buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
-        }
-        for (Button b : buttons) {
-            main.add(b);                //add to layout
-        }
-        body.add(top, BorderLayout.NORTH);
-        body.add(main, BorderLayout.CENTER);
-        getContentPane().add(body);
     }
 
     public String calc(String inputVal) {
@@ -187,6 +198,63 @@ public class App extends JFrame {
         }
         return "ERROR";
     }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        String value=input.getText();
+        switch(e.getKeyCode())
+        {
+            case KeyEvent.VK_BACK_SPACE:{
+
+                if (value.length() > 1 && value.indexOf('-') == -1)
+                    value = value.substring(0, value.length() - 1);
+                else if (value.length() > 2 && value.indexOf('-') != -1)
+                    value = value.substring(0, value.length() - 1);
+                else value = "0";
+
+            }break;
+            default: {
+                switch (String.valueOf(e.getKeyChar())) {
+                    case "e":
+                    case "0":
+                    case "1":
+                    case "2":
+                    case "3":
+                    case "4":
+                    case "5":
+                    case "6":
+                    case "7":
+                    case "8":
+                    case "9":
+                    case ",":
+                    case ".":
+                    case "+":
+                    case "-":
+                    case "*":
+                    case "/":
+                    case "^":
+                    case "(":
+                    case ")": {
+                        if (!value.equals("0"))
+                            value += String.valueOf(e.getKeyChar());
+                        else
+                            value = String.valueOf(e.getKeyChar());
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+        input.setText(value);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
 }
 
 class Button extends JButton {
@@ -239,5 +307,7 @@ class Input extends JTextField {
     public Input() {
         super();
         setText("0");
+        setEnabled(false);
+        setDisabledTextColor(new Color(000));
     }
 }
