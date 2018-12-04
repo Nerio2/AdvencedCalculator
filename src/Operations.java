@@ -121,6 +121,9 @@ public class Operations {
     }
 
     public static double add(double a, double b) {
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println((float)a+b);
         return a + b;
     }
 

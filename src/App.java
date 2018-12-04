@@ -18,7 +18,6 @@ import java.util.List;
 
 /*
  * Testing results:
- * - double "," works, you can put number like "32,3,4"
  * - problems with infinity (no char for that and problems with for ex. infinity*-3)
  */
 
@@ -28,6 +27,7 @@ public class App extends JFrame implements KeyListener {
     private Input input;
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
+
 
     public App() {
         super("Kalkulator");
@@ -42,7 +42,7 @@ public class App extends JFrame implements KeyListener {
         setVisible(true);
         setSize(350, 500);
 
-        input = new Input();                      //creating input and add to top layout
+        input = new Input(this);                      //creating input and add to top layout
         input.setSize(300, 100);
         top.add(input);
 
@@ -87,13 +87,16 @@ public class App extends JFrame implements KeyListener {
                 readData = String.valueOf((char) read);
                 switch (readData) {
                     case ",":
+                        readData = ".";
                     case ".": {
                         if (currentVal.equals(")")) {
                             currentVal = "";
                             getOperations().addAction("*");
-                        } else currentVal += ".";
+                            break;
+                        }
+                        if (currentVal.contains("."))
+                            break;
                     }
-                    break;
                     case "e":
                     case "π":
                     case "0":
@@ -110,20 +113,7 @@ public class App extends JFrame implements KeyListener {
                             currentVal = "";
                             getOperations().addAction("*");
                         }
-                        if (readData.equals("e") && !currentVal.equals("")) {
-                            getOperations().addValue(currentVal);
-                            currentVal = "";
-                            getOperations().addAction("*");
-                        } else if (currentVal.equals("e")) {
-                            getOperations().addValue(currentVal);
-                            currentVal = "";
-                            getOperations().addAction("*");
-                        }
-                        if (readData.equals("π") && !currentVal.equals("")) {
-                            getOperations().addValue(currentVal);
-                            currentVal = "";
-                            getOperations().addAction("*");
-                        } else if (currentVal.equals("π")) {
+                        if ((readData.equals("e") || readData.equals("π")) && !currentVal.equals("") || (currentVal.equals("e") || currentVal.equals("π"))) {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
@@ -178,6 +168,8 @@ public class App extends JFrame implements KeyListener {
                         }
                     }
                     break;
+                    case " ":
+                        break;
                     default:
                         return "ERROR unknown value: \"" + readData + "\"";
                 }
@@ -199,12 +191,19 @@ public class App extends JFrame implements KeyListener {
         return "ERROR";
     }
 
+    public static boolean shiftPressed = false;
+
     @Override
     public void keyPressed(KeyEvent e) {
-        String value=input.getText();
-        switch(e.getKeyCode())
-        {
-            case KeyEvent.VK_BACK_SPACE:{
+        String value = input.getText();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SHIFT: {
+                if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    shiftPressed = true;
+                }
+            }
+            break;
+            case KeyEvent.VK_BACK_SPACE: {
 
                 if (value.length() > 1 && value.indexOf('-') == -1)
                     value = value.substring(0, value.length() - 1);
@@ -212,48 +211,61 @@ public class App extends JFrame implements KeyListener {
                     value = value.substring(0, value.length() - 1);
                 else value = "0";
 
-            }break;
-            default: {
-                switch (String.valueOf(e.getKeyChar())) {
-                    case "e":
-                    case "0":
-                    case "1":
-                    case "2":
-                    case "3":
-                    case "4":
-                    case "5":
-                    case "6":
-                    case "7":
-                    case "8":
-                    case "9":
-                    case ",":
-                    case ".":
-                    case "+":
-                    case "-":
-                    case "*":
-                    case "/":
-                    case "^":
-                    case "(":
-                    case ")": {
-                        if (!value.equals("0"))
-                            value += String.valueOf(e.getKeyChar());
-                        else
-                            value = String.valueOf(e.getKeyChar());
-                    }
+            }
+            break;
+            case KeyEvent.VK_ENTER:
+            case KeyEvent.VK_EQUALS: {
+                if (!shiftPressed) {
+                    value = calc(value);
+                    input.setText(value);
                     break;
                 }
             }
-            break;
         }
         input.setText(value);
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
+        String value = input.getText();
+        switch (String.valueOf(e.getKeyChar())) {
+            case "e":
+            case "0":
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+            case ",":
+            case ".":
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+            case "^":
+            case "(":
+            case ")": {
+                if (!value.equals("0"))
+                    value += String.valueOf(e.getKeyChar());
+                else
+                    value = String.valueOf(e.getKeyChar());
+            }
+            break;
+
+        }
+        input.setText(value);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            shiftPressed = false;
+            System.out.println("puszczam");
+        }
     }
 }
 
@@ -261,6 +273,7 @@ class Button extends JButton {
 
     public Button(String text, Input input, App app) {
         super(text);
+        addKeyListener(app);
         addActionListener(e -> {
             String value = input.getText();
             switch (text) {
@@ -303,11 +316,37 @@ class Button extends JButton {
     }
 }
 
-class Input extends JTextField {
-    public Input() {
+class Input extends JTextField implements KeyListener {
+    private App app;
+
+    public Input(App app) {
         super();
+        this.app = app;
+        addKeyListener(this);
         setText("0");
-        setEnabled(false);
+        setEnabled(true);
         setDisabledTextColor(new Color(000));
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            App.shiftPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_EQUALS && !App.shiftPressed) {
+            setText(app.calc(getText()));
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            App.shiftPressed = false;
+        }
     }
 }
