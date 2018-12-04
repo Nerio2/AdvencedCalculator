@@ -1,11 +1,12 @@
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Operations {
 
 
-    private List<Double> values = new ArrayList<Double>();
-    private List<String> actions = new ArrayList<String>();
+    private List<Double> values = new ArrayList<>();
+    private List<String> actions = new ArrayList<>();
 
     public void addValue(String value) {
         switch (value) {
@@ -24,11 +25,6 @@ public class Operations {
         }
 
     }
-
-    public double getValue(int index) {
-        return values.get(index);
-    }
-
 
     public void addAction(String action) {
         actions.add(action);
@@ -55,19 +51,27 @@ public class Operations {
     }
 
     public String calculate() {
-        if (values.size() >= 2) {
+        if (values.size() >= 1) {
             double result = 0;
             while (actions.size() >= 1) {
                 String action = getAction();
                 result = values.get(actions.indexOf(action));
                 double val1 = values.get(actions.indexOf(action));
                 double val2 = 0;
-                if (action != "√")
+                if (!action.equals("√")) {
                     try {
                         val2 = values.get(actions.indexOf(action) + 1);
                     } catch (IndexOutOfBoundsException x) {
                         return String.valueOf(result);
                     }
+                }
+                else{
+                    if(val1<0)
+                        return "ERROR: You can't calculate a root from a negative number";
+                }
+                if(action.equals("/") && val2==0){
+                    return "ERROR: You can't devide by 0";
+                }
                 String exception = "";
                 switch (action) {
                     case "*": {
@@ -121,10 +125,8 @@ public class Operations {
     }
 
     public static double add(double a, double b) {
-        System.out.println(a);
-        System.out.println(b);
-        System.out.println((float)a+b);
-        return a + b;
+        return a+b;
+
     }
 
     public static double sub(double a, double b) {

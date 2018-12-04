@@ -23,14 +23,13 @@ import java.util.List;
 
 public class App extends JFrame implements KeyListener {
 
-    private String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
     private Input input;
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
 
-
     public App() {
-        super("Kalkulator");
+        super("Calculator");
+        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
         addKeyListener(this);
         setFocusable(true);
         pack();
@@ -47,6 +46,7 @@ public class App extends JFrame implements KeyListener {
         top.add(input);
 
         List<Button> buttons = new ArrayList<>();      //button list
+
         for (String txt : text) {
             buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
         }
@@ -156,13 +156,13 @@ public class App extends JFrame implements KeyListener {
                     }
                     break;
                     case ")": {
-                        if (!currentVal.equals("")) {
+                        if (!currentVal.equals("") && !currentVal.contains("ERROR")) {
                             getOperations().addValue(currentVal);
                         }
                         operationDegree--;
                         currentVal = getOperations(operationDegree + 1).calculate();
                         removeOperation(operationDegree + 1);
-                        if (!currentVal.equals("")) {
+                        if (!currentVal.equals("") && !currentVal.contains("ERROR") ) {
                             getOperations().addValue(currentVal);
                             currentVal = ")";
                         }
@@ -173,14 +173,17 @@ public class App extends JFrame implements KeyListener {
                     default:
                         return "ERROR unknown value: \"" + readData + "\"";
                 }
+                if(currentVal.contains("ERROR"))
+                    return currentVal;
             }
-            if (!currentVal.equals("")) {
+            if (!currentVal.equals("") && !currentVal.contains("ERROR") && !currentVal.equals(")")) {
                 getOperations().addValue(currentVal);
                 currentVal = "";
             }
             while (operationDegree >= 0) {
                 operationDegree--;
                 currentVal = getOperations(operationDegree + 1).calculate();
+                if(currentVal.contains("ERROR"))break;
                 removeOperation(operationDegree + 1);
             }
             resetOperations();
@@ -264,7 +267,6 @@ public class App extends JFrame implements KeyListener {
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
             shiftPressed = false;
-            System.out.println("puszczam");
         }
     }
 }
@@ -325,7 +327,6 @@ class Input extends JTextField implements KeyListener {
         addKeyListener(this);
         setText("0");
         setEnabled(true);
-        setDisabledTextColor(new Color(000));
     }
 
     @Override
