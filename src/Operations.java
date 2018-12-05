@@ -5,21 +5,21 @@ import java.util.List;
 public class Operations {
 
 
-    private List<Double> values = new ArrayList<>();
+    private List<BigDecimal> values = new ArrayList<>();
     private List<String> actions = new ArrayList<>();
 
     public void addValue(String value) {
         switch (value) {
             case "π": {
-                values.add(Math.PI);
+                values.add(new BigDecimal(Math.PI));
             }
             break;
             case "e": {
-                values.add(Math.E);
+                values.add(new BigDecimal(Math.E));
             }
             break;
             default: {
-                values.add(Double.parseDouble(value));
+                values.add(new BigDecimal(value));
             }
             break;
         }
@@ -52,12 +52,12 @@ public class Operations {
 
     public String calculate() {
         if (values.size() >= 1) {
-            double result = 0;
+            BigDecimal result = new BigDecimal(0);
             while (actions.size() >= 1) {
                 String action = getAction();
                 result = values.get(actions.indexOf(action));
-                double val1 = values.get(actions.indexOf(action));
-                double val2 = 0;
+                BigDecimal val1 = values.get(actions.indexOf(action));
+                BigDecimal val2 = new BigDecimal(0);
                 if (!action.equals("√")) {
                     try {
                         val2 = values.get(actions.indexOf(action) + 1);
@@ -66,10 +66,10 @@ public class Operations {
                     }
                 }
                 else{
-                    if(val1<0)
+                    if(val1.doubleValue()<0)
                         return "ERROR: You can't calculate a root from a negative number";
                 }
-                if(action.equals("/") && val2==0){
+                if(action.equals("/") && val2.equals(new BigDecimal(0))){
                     return "ERROR: You can't devide by 0";
                 }
                 String exception = "";
@@ -91,7 +91,7 @@ public class Operations {
                     }
                     break;
                     case "√": {
-                        result = sqrt(val1, 2);
+                        result = sqrt(val1, new BigDecimal(2));
                         exception = "√";
                     }
                     break;
@@ -124,30 +124,29 @@ public class Operations {
         return "";
     }
 
-    public static double add(double a, double b) {
-        return a+b;
+    public static BigDecimal add(BigDecimal a, BigDecimal b) {
+        return a.add(b);
 
     }
 
-    public static double sub(double a, double b) {
-        return a - b;
+    public static BigDecimal sub(BigDecimal a, BigDecimal b) {
+        return a.subtract(b);
     }
 
-    public static double mult(double a, double b) {
-        return a * b;
+    public static BigDecimal mult(BigDecimal a, BigDecimal b) {
+        return a.multiply(b);
     }
 
-    public static double div(double a, double b) {
-        if (b == 0) return a;
-        else return a / b;
+    public static BigDecimal div(BigDecimal a, BigDecimal b) {
+        return a.divide(b);
     }
 
-    public static double pow(double a, double b) {
-        return Math.pow(a, b);
+    public static BigDecimal pow(BigDecimal a, BigDecimal b) {
+        return new BigDecimal(Math.pow(a.doubleValue(),b.doubleValue()));
     }
 
-    public static double sqrt(double a, double b) {
-        if (b == 0) return a;
-        else return pow(a, 1 / b);
+    public static BigDecimal sqrt(BigDecimal a, BigDecimal b) {
+        if(b.equals(new BigDecimal(0)))return new BigDecimal(1);
+        return pow(a, div(new BigDecimal(1) , b));
     }
 }
