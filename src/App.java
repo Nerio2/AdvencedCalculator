@@ -84,6 +84,7 @@ public class App extends JFrame implements KeyListener {
             String currentVal = "";
             int read;
             while ((read = reader.read()) != -1) {
+                StringBuilder sb=new StringBuilder(currentVal);
                 readData = String.valueOf((char) read);
                 switch (readData) {
                     case ",":
@@ -117,8 +118,11 @@ public class App extends JFrame implements KeyListener {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
+                            sb=new StringBuilder(currentVal);
                         }
-                        currentVal += readData;
+
+                        sb.append(readData);
+                        currentVal=sb.toString();
                     }
                     break;
                     case "-":
