@@ -1,14 +1,15 @@
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Operations {
+class Operations {
 
 
     private List<BigDecimal> values = new ArrayList<>();
     private List<String> actions = new ArrayList<>();
 
-    public void addValue(String value) {
+    void addValue(String value) {
         switch (value) {
             case "π": {
                 values.add(new BigDecimal(Math.PI));
@@ -26,7 +27,7 @@ public class Operations {
 
     }
 
-    public void addAction(String action) {
+    void addAction(String action) {
         actions.add(action);
     }
 
@@ -50,7 +51,7 @@ public class Operations {
         return action;
     }
 
-    public String calculate() {
+    String calculate() {
         if (values.size() >= 1) {
             BigDecimal result = new BigDecimal(0);
             while (actions.size() >= 1) {
@@ -105,7 +106,7 @@ public class Operations {
                         System.out.println("action: " + action + " at " + val1 + " with result: " + result);
                         values.remove(actions.indexOf(action));
                         values.add(actions.indexOf(action), result);
-                        actions.remove(actions.indexOf(action));
+                        actions.remove(action);
                     }
                     break;
                     default: {
@@ -113,7 +114,7 @@ public class Operations {
                         values.remove(actions.indexOf(action) + 1);
                         values.remove(actions.indexOf(action));
                         values.add(actions.indexOf(action), result);
-                        actions.remove(actions.indexOf(action));
+                        actions.remove(action);
                     }
                     break;
                 }
@@ -124,28 +125,28 @@ public class Operations {
         return "";
     }
 
-    public static BigDecimal add(BigDecimal a, BigDecimal b) {
+    private static BigDecimal add(BigDecimal a, BigDecimal b) {
         return a.add(b);
 
     }
 
-    public static BigDecimal sub(BigDecimal a, BigDecimal b) {
+    private static BigDecimal sub(BigDecimal a, BigDecimal b) {
         return a.subtract(b);
     }
 
-    public static BigDecimal mult(BigDecimal a, BigDecimal b) {
+    private static BigDecimal mult(BigDecimal a, BigDecimal b) {
         return a.multiply(b);
     }
 
-    public static BigDecimal div(BigDecimal a, BigDecimal b) {
-        return a.divide(b);
+    private static BigDecimal div(BigDecimal a, BigDecimal b) {
+        return a.divide(b,10, RoundingMode.UP);
     }
 
-    public static BigDecimal pow(BigDecimal a, BigDecimal b) {
+    private static BigDecimal pow(BigDecimal a, BigDecimal b) {
         return new BigDecimal(Math.pow(a.doubleValue(),b.doubleValue()));
     }
 
-    public static BigDecimal sqrt(BigDecimal a, BigDecimal b) {
+    private static BigDecimal sqrt(BigDecimal a, BigDecimal b) {
         if(b.equals(new BigDecimal(0)))return new BigDecimal(1);
         return pow(a, div(new BigDecimal(1) , b));
     }

@@ -27,7 +27,7 @@ public class App extends JFrame implements KeyListener {
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
 
-    public App() {
+    App() {
         super("Calculator");
         String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
         addKeyListener(this);
@@ -71,12 +71,12 @@ public class App extends JFrame implements KeyListener {
         operacje.remove(degree);
     }
 
-    public void resetOperations() {
+    void resetOperations() {
         operacje = new ArrayList<>();
         operationDegree = 0;
     }
 
-    public String calc(String inputVal) {
+    String calc(String inputVal) {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new StringReader(inputVal));
@@ -194,7 +194,7 @@ public class App extends JFrame implements KeyListener {
         return "ERROR";
     }
 
-    public static boolean shiftPressed = false;
+    static boolean shiftPressed = false;
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -273,7 +273,7 @@ public class App extends JFrame implements KeyListener {
 
 class Button extends JButton {
 
-    public Button(String text, Input input, App app) {
+    Button(String text, Input input, App app) {
         super(text);
         addKeyListener(app);
         addActionListener(e -> {
@@ -321,7 +321,7 @@ class Button extends JButton {
 class Input extends JTextField implements KeyListener {
     private App app;
 
-    public Input(App app) {
+    Input(App app) {
         super();
         this.app = app;
         addKeyListener(this);
