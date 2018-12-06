@@ -14,15 +14,16 @@ import java.util.List;
  * 3. What's next?:
  * - File input support;
  * - Extends for functions and calculating value for "x";
+ * - Calculations in other Thread
  */
 
 /*
  * Testing results:
  * - problems with infinity (no char for that and problems with for ex. infinity*-3)
+ * -not closed brackets error. That should work: 2*(2+2    =8
  */
 
 public class App extends JFrame implements KeyListener {
-
     private Input input;
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
@@ -47,10 +48,10 @@ public class App extends JFrame implements KeyListener {
 
         List<Button> buttons = new ArrayList<>();      //button list
 
-        for (String txt : text) {
+        for ( String txt : text ) {
             buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
         }
-        for (Button b : buttons) {
+        for ( Button b : buttons ) {
             main.add(b);                //add to layout
         }
         body.add(top, BorderLayout.NORTH);
@@ -59,7 +60,8 @@ public class App extends JFrame implements KeyListener {
     }
 
     private Operations getOperations() {
-        if (operacje.size() < operationDegree + 1) operacje.add(operationDegree, new Operations());
+        for ( int i = operacje.size() ; i < operationDegree + 1 ; i++ )
+            operacje.add(i, new Operations());
         return getOperations(operationDegree);
     }
 
@@ -83,10 +85,10 @@ public class App extends JFrame implements KeyListener {
             String readData;
             String currentVal = "";
             int read;
-            while ((read = reader.read()) != -1) {
-                StringBuilder sb=new StringBuilder(currentVal);
+            while ( (read = reader.read()) != -1 ) {
+                StringBuilder sb = new StringBuilder(currentVal);
                 readData = String.valueOf((char) read);
-                switch (readData) {
+                switch ( readData ) {
                     case ",":
                         readData = ".";
                     case ".": {
@@ -118,11 +120,11 @@ public class App extends JFrame implements KeyListener {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
-                            sb=new StringBuilder(currentVal);
+                            sb = new StringBuilder(currentVal);
                         }
 
                         sb.append(readData);
-                        currentVal=sb.toString();
+                        currentVal = sb.toString();
                     }
                     break;
                     case "-":
@@ -166,7 +168,7 @@ public class App extends JFrame implements KeyListener {
                         operationDegree--;
                         currentVal = getOperations(operationDegree + 1).calculate();
                         removeOperation(operationDegree + 1);
-                        if (!currentVal.equals("") && !currentVal.contains("ERROR") ) {
+                        if (!currentVal.equals("") && !currentVal.contains("ERROR")) {
                             getOperations().addValue(currentVal);
                             currentVal = ")";
                         }
@@ -177,22 +179,25 @@ public class App extends JFrame implements KeyListener {
                     default:
                         return "ERROR unknown value: \"" + readData + "\"";
                 }
-                if(currentVal.contains("ERROR"))
+                if (currentVal.contains("ERROR"))
                     return currentVal;
             }
             if (!currentVal.equals("") && !currentVal.contains("ERROR") && !currentVal.equals(")")) {
                 getOperations().addValue(currentVal);
                 currentVal = "";
             }
-            while (operationDegree >= 0) {
+            while ( operationDegree >= 0 ) {
                 operationDegree--;
                 currentVal = getOperations(operationDegree + 1).calculate();
-                if(currentVal.contains("ERROR"))break;
+                if (currentVal.contains("ERROR")) break;
                 removeOperation(operationDegree + 1);
             }
             resetOperations();
+            while ( currentVal.length() > 1 && (currentVal.lastIndexOf('0') == currentVal.length() - 1 || currentVal.lastIndexOf('.') == currentVal.length() - 1) ) {
+                currentVal = currentVal.substring(0, currentVal.length() - 1);
+            }
             return currentVal;
-        } catch (IOException x) {
+        } catch ( IOException x ) {
             System.out.println("ERROR");
         }
         return "ERROR";
@@ -203,7 +208,7 @@ public class App extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         String value = input.getText();
-        switch (e.getKeyCode()) {
+        switch ( e.getKeyCode() ) {
             case KeyEvent.VK_SHIFT: {
                 if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                     shiftPressed = true;
@@ -235,7 +240,7 @@ public class App extends JFrame implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
         String value = input.getText();
-        switch (String.valueOf(e.getKeyChar())) {
+        switch ( String.valueOf(e.getKeyChar()) ) {
             case "e":
             case "0":
             case "1":
@@ -282,7 +287,7 @@ class Button extends JButton {
         addKeyListener(app);
         addActionListener(e -> {
             String value = input.getText();
-            switch (text) {
+            switch ( text ) {
                 case "<=": {
                     if (value.length() > 1 && value.indexOf('-') == -1)
                         value = value.substring(0, value.length() - 1);
