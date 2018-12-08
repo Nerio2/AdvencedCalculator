@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * 1. State: In testing right now.
+ * 1. State: Adding infinity as a button and a char recognized by the program
  * 2. efficiency: should work.
  * 3. What's next?:
  * - File input support;
@@ -18,9 +18,8 @@ import java.util.List;
  */
 
 /*
- * Testing results:
- * - problems with infinity (no char for that and problems with for ex. infinity*-3)
- * -not closed brackets error. That should work: 2*(2+2    =8
+ * Testing results: all problems solved now (infinity char in progress)
+ *
  */
 
 public class App extends JFrame implements KeyListener {
@@ -31,6 +30,7 @@ public class App extends JFrame implements KeyListener {
     App() {
         super("Calculator");
         String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
+        // infinity: ∞
         addKeyListener(this);
         setFocusable(true);
         pack();
@@ -187,13 +187,15 @@ public class App extends JFrame implements KeyListener {
                 currentVal = "";
             }
             while ( operationDegree >= 0 ) {
+                if(!currentVal.equals(""))
+                    getOperations().addValue(currentVal);
                 operationDegree--;
                 currentVal = getOperations(operationDegree + 1).calculate();
                 if (currentVal.contains("ERROR")) break;
                 removeOperation(operationDegree + 1);
             }
             resetOperations();
-            while ( currentVal.length() > 1 && (currentVal.lastIndexOf('0') == currentVal.length() - 1 || currentVal.lastIndexOf('.') == currentVal.length() - 1) ) {
+            while (currentVal.contains(".") && currentVal.length() > 1 && (currentVal.lastIndexOf('0') == currentVal.length() - 1 || currentVal.lastIndexOf('.') == currentVal.length() - 1) ) {
                 currentVal = currentVal.substring(0, currentVal.length() - 1);
             }
             return currentVal;
