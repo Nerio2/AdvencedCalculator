@@ -38,13 +38,29 @@ class Operations {
 
     void addValue(String value) {
         switch ( value ) {
+            case "∞":{
+                infinityInside=true;
+                values.add(new BigDecimal(1));
+            }
             case "π": {
-
                 values.add(new BigDecimal(Math.PI, rounding));
             }
             break;
             case "e": {
                 values.add(new BigDecimal(Math.E, rounding));
+            }
+            break;
+            case "-∞":{
+                infinityInside=true;
+                values.add(new BigDecimal(-1));
+            }
+            break;
+            case "-π": {
+                values.add(new BigDecimal(-Math.PI, rounding));
+            }
+            break;
+            case "-e": {
+                values.add(new BigDecimal(-Math.E, rounding));
             }
             break;
             default: {

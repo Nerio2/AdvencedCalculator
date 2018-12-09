@@ -5,7 +5,9 @@ import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -27,10 +29,11 @@ public class App extends JFrame implements KeyListener {
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
 
+    private static List<String> exceptions=new ArrayList<>(Arrays.asList("π","e","∞"));
+
     App() {
         super("Calculator");
-        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "="};
-        // infinity: ∞
+        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞"};
         addKeyListener(this);
         setFocusable(true);
         pack();
@@ -100,6 +103,7 @@ public class App extends JFrame implements KeyListener {
                         if (currentVal.contains("."))
                             break;
                     }
+                    case "∞":
                     case "e":
                     case "π":
                     case "0":
@@ -116,7 +120,7 @@ public class App extends JFrame implements KeyListener {
                             currentVal = "";
                             getOperations().addAction("*");
                         }
-                        if ((readData.equals("e") || readData.equals("π")) && !currentVal.equals("") || (currentVal.equals("e") || currentVal.equals("π"))) {
+                        if ((!currentVal.equals("") && !currentVal.equals("-")) && (exceptions.contains(readData) || exceptions.contains(currentVal) || exceptions.contains("-"+currentVal))) {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
@@ -187,7 +191,7 @@ public class App extends JFrame implements KeyListener {
                 currentVal = "";
             }
             while ( operationDegree >= 0 ) {
-                if(!currentVal.equals(""))
+                if (!currentVal.equals(""))
                     getOperations().addValue(currentVal);
                 operationDegree--;
                 currentVal = getOperations(operationDegree + 1).calculate();
@@ -195,7 +199,7 @@ public class App extends JFrame implements KeyListener {
                 removeOperation(operationDegree + 1);
             }
             resetOperations();
-            while (currentVal.contains(".") && currentVal.length() > 1 && (currentVal.lastIndexOf('0') == currentVal.length() - 1 || currentVal.lastIndexOf('.') == currentVal.length() - 1) ) {
+            while ( currentVal.contains(".") && currentVal.length() > 1 && (currentVal.lastIndexOf('0') == currentVal.length() - 1 || currentVal.lastIndexOf('.') == currentVal.length() - 1) ) {
                 currentVal = currentVal.substring(0, currentVal.length() - 1);
             }
             return currentVal;
