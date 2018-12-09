@@ -8,16 +8,18 @@ public class Main extends JFrame {
 
         EventQueue.invokeLater(App::new);
         /*
-        double in=Double.POSITIVE_INFINITY;
-        double nin=Double.NEGATIVE_INFINITY;
-        System.out.println(Math.pow(in,nin));
-        System.out.println(in/nin);
-        System.out.println(in*nin);
-        System.out.println(in-nin);
-        System.out.println(nin-in);
-        System.out.println(in+nin);
-        System.out.println(nin+in);
+        //Testing~
+        double in = Double.POSITIVE_INFINITY;
+        double nin = Double.NEGATIVE_INFINITY;
+        System.out.println(Math.pow(in, nin));  //=0
+        System.out.println(in / in);            //=NaN
+        System.out.println(in * nin);           //=-Infinity
+        System.out.println(in - nin);           //=Infinity
+        System.out.println(nin - in);           //=-Infinity
+        System.out.println(in + nin);           //=NaN
+        System.out.println(nin + in);           //=NaN
         */
+
 
     }
 }

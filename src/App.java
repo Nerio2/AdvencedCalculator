@@ -5,23 +5,21 @@ import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /*
- * 1. State: Adding infinity as a button and a char recognized by the program
+ * 1. State: Testing
  * 2. efficiency: should work.
  * 3. What's next?:
  * - File input support;
  * - Extends for functions and calculating value for "x";
- * - Calculations in other Thread
+ * - Calculations in other Thread?;
  */
 
 /*
- * Testing results: all problems solved now (infinity char in progress)
- *
+ * Testing results: all problems solved now
  */
 
 public class App extends JFrame implements KeyListener {
@@ -29,7 +27,7 @@ public class App extends JFrame implements KeyListener {
     private List<Operations> operacje = new ArrayList<>();
     private int operationDegree = 0;
 
-    private static List<String> exceptions=new ArrayList<>(Arrays.asList("π","e","∞"));
+    private static List<String> exceptions = new ArrayList<>(Arrays.asList("π", "e", "∞"));
 
     App() {
         super("Calculator");
@@ -120,7 +118,7 @@ public class App extends JFrame implements KeyListener {
                             currentVal = "";
                             getOperations().addAction("*");
                         }
-                        if ((!currentVal.equals("") && !currentVal.equals("-")) && (exceptions.contains(readData) || exceptions.contains(currentVal) || exceptions.contains("-"+currentVal))) {
+                        if ((!currentVal.equals("") && !currentVal.equals("-")) && (exceptions.contains(readData) || exceptions.contains(currentVal) || exceptions.contains("-" + currentVal))) {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
