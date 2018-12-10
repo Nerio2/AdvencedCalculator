@@ -126,6 +126,8 @@ class Operations {
                     try {
                         if (!val1.equals(new BigDecimal(valuesChceck.get(actions.indexOf(action))))) {
                             return "ERROR";
+                        } else if (!val2.equals(new BigDecimal(valuesChceck.get(actions.indexOf(action) + 1)))) {
+                            return "ERROR";
                         }
                     } catch ( NumberFormatException x ) {
                         if (valuesChceck.get(actions.indexOf(action)).contains("∞")) {
@@ -133,7 +135,19 @@ class Operations {
                             try {
                                 if ((action.equals("-") || action.equals("+")) && !valuesChceck.get(actions.indexOf(action) + 1).contains("∞"))
                                     emergencyResult = valuesChceck.get(actions.indexOf(action));
-                                if (action.equals("/") && valuesChceck.get(actions.indexOf(action) + 1).contains("∞"))
+                                else if (action.equals("/") && valuesChceck.get(actions.indexOf(action) + 1).contains("∞"))
+                                    return "Invalid value";
+                            } catch ( IndexOutOfBoundsException z ) {
+                                return valuesChceck.get(actions.indexOf(action));
+                            }
+                        } else if (valuesChceck.get(actions.indexOf(action) + 1).contains("∞")) {
+                            exception = "infinityValue";
+                            try {
+                                if (action.equals("/"))
+                                    emergencyResult = "0";
+                                else if ((action.equals("-") || action.equals("+")) && !valuesChceck.get(actions.indexOf(action)).contains("∞"))
+                                    emergencyResult = action + valuesChceck.get(actions.indexOf(action) + 1);
+                                else if (action.equals("/") && valuesChceck.get(actions.indexOf(action)).contains("∞"))
                                     return "Invalid value";
                             } catch ( IndexOutOfBoundsException z ) {
                                 return valuesChceck.get(actions.indexOf(action));
@@ -143,36 +157,39 @@ class Operations {
                     try {
                         result = getResult(action, val1, val2);
                     } catch ( NumberFormatException x ) {
-                        exception = "infinityValue";
                         emergencyResult = getEmergencyResult(x);
+                        if (emergencyResult.contains("∞"))
+                            exception = "infinityValue";
                     }
                     if (String.valueOf(result).length() > 2 && String.valueOf(result).charAt(0) == '0' && String.valueOf(result).charAt(1) == 'E')
                         result = new BigDecimal(0, rounding);
                     int numberOfValues;     //to delete
                     switch ( exception ) {
                         case "infinityValue": {
-                            if (!emergencyResult.contains("∞")) {
-                                if (result.doubleValue() > 0) emergencyResult = "+∞";
-                                else if (result.doubleValue() < 0) emergencyResult = "-∞";
+                            if (emergencyResult.equals("0")) {
+                                result = new BigDecimal(0);
+                                emergencyResult = "";
+                            } else if (!emergencyResult.contains("∞")) {
+                                if (result.doubleValue() > 0) emergencyResult = POSITIVE_INFINITY;
+                                else if (result.doubleValue() < 0) emergencyResult = NEGATIVE_INFINITY;
                                 else return "Invalid value";
                             } else {
                                 if (emergencyResult.contains("-")) result = new BigDecimal(-1);
                                 else result = new BigDecimal(1);
                             }
-                            numberOfValues=2;
+                            numberOfValues = 2;
                         }
                         break;
                         case "√": {
-                            numberOfValues=1;
+                            numberOfValues = 1;
                         }
                         break;
                         default: {
-                            numberOfValues=2;
+                            numberOfValues = 2;
                         }
                         break;
                     }
-                    submit(action,result,numberOfValues,emergencyResult);
-
+                    submit(action, result, numberOfValues, emergencyResult);
                 }
                 if (!emergencyResult.equals("")) {
                     if (result.doubleValue() < 0) return NEGATIVE_INFINITY;
@@ -184,6 +201,7 @@ class Operations {
         return "";
     }
 
+    //Actions
     private static BigDecimal add(BigDecimal a, BigDecimal b) {
         return a.add(b, rounding);
     }
@@ -192,8 +210,15 @@ class Operations {
         return a.subtract(b, rounding);
     }
 
-    private static BigDecimal mult(BigDecimal a, BigDecimal b) {
-        return a.multiply(b, rounding);
+    private static BigDecimal mult(BigDecimal a, BigDecimal b) throws NumberFormatException {
+        try {
+            return a.multiply(b, rounding);
+        } catch ( NumberFormatException x ) {
+            if (a.doubleValue() < 0 && b.doubleValue() % 2 != 0) {
+                throw new NumberFormatException(NEGATIVE_INFINITY);
+            }
+            throw new NumberFormatException(POSITIVE_INFINITY);
+        }
     }
 
     private static BigDecimal div(BigDecimal a, BigDecimal b) {
@@ -241,19 +266,19 @@ class Operations {
         }
         return val1;
     }
-    private void submit(String action, BigDecimal result, int numberOfValues, String emergencyResult){
-        int index=actions.indexOf(action);
-        System.out.print("action: " + action + " at " + valuesChceck.get(index) + " and " + valuesChceck.get(index+1) + " with result: ");
-        for(int i=0;i<numberOfValues;i++){
+
+    private void submit(String action, BigDecimal result, int numberOfValues, String emergencyResult) {
+        int index = actions.indexOf(action);
+        System.out.print("action: " + action + " at " + valuesChceck.get(index) + " and " + valuesChceck.get(index + 1) + " with result: ");
+        for ( int i = 0 ; i < numberOfValues ; i++ ) {
             values.remove(index);
             valuesChceck.remove(index);
         }
         values.add(index, result);
-        if(emergencyResult.equals("")) {
+        if (emergencyResult.equals("")) {
             System.out.println(result);
             valuesChceck.add(index, String.valueOf(result));
-        }
-        else {
+        } else {
             System.out.println(emergencyResult);
             valuesChceck.add(index, emergencyResult);
         }

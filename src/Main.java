@@ -1,6 +1,9 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 public class Main extends JFrame {
 
@@ -19,7 +22,5 @@ public class Main extends JFrame {
         System.out.println(in + nin);           //=NaN
         System.out.println(nin + in);           //=NaN
         */
-
-
     }
 }
