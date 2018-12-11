@@ -3,15 +3,17 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LayoutLayer extends JFrame implements KeyListener {
     private Input input;
-    private CalculationLayer calculationLayer= new CalculationLayer();
+    private CalculationLayer calculationLayer = new CalculationLayer();
+    private List<String> acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
 
     LayoutLayer() {
         super("Calculator");
-        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞"};
+        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞", "!"};
         addKeyListener(this);
         setFocusable(true);
         pack();
@@ -69,7 +71,7 @@ public class LayoutLayer extends JFrame implements KeyListener {
             case KeyEvent.VK_ENTER:
             case KeyEvent.VK_EQUALS: {
                 if (!shiftPressed) {
-                    value = calc(value);    //odwolanie do Calculation Layer
+                    value = calc(value);
                     input.setText(value);
                     break;
                 }
@@ -81,34 +83,11 @@ public class LayoutLayer extends JFrame implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
         String value = input.getText();
-        switch ( String.valueOf(e.getKeyChar()) ) {
-            case "e":
-            case "0":
-            case "1":
-            case "2":
-            case "3":
-            case "4":
-            case "5":
-            case "6":
-            case "7":
-            case "8":
-            case "9":
-            case ",":
-            case ".":
-            case "+":
-            case "-":
-            case "*":
-            case "/":
-            case "^":
-            case "(":
-            case ")": {
-                if (!value.equals("0"))
-                    value += String.valueOf(e.getKeyChar());
-                else
-                    value = String.valueOf(e.getKeyChar());
-            }
-            break;
-
+        if(acceptedChars.contains(String.valueOf(e.getKeyChar()))) {
+            if (!value.equals("0"))
+                value += String.valueOf(e.getKeyChar());
+            else
+                value = String.valueOf(e.getKeyChar());
         }
         input.setText(value);
     }
@@ -143,7 +122,7 @@ class Button extends JButton {
                 }
                 break;
                 case "=": {
-                    value = app.calc(value);        //niech idzie przez LayoutLayer
+                    value = app.calc(value);
                 }
                 break;
                 case "x^2": {
@@ -189,7 +168,7 @@ class Input extends JTextField implements KeyListener {
             LayoutLayer.shiftPressed = true;
         }
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_EQUALS && !LayoutLayer.shiftPressed) {
-            setText(app.calc(getText()));           //niech idzie przez LayoutLayer
+            setText(app.calc(getText()));
         }
     }
 

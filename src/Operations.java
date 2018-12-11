@@ -37,38 +37,48 @@ class Operations {
     }
 
     void addValue(String value) {
-        valuesChceck.add(value);
-        switch ( value ) {
-            case "∞": {
+        if (value.indexOf("!") == value.length() - 1) {
+            try {
+                BigDecimal val = factorial(new BigDecimal(Integer.parseInt(value.substring(0, value.length() - 1))));
+                values.add(val);
+                valuesChceck.add(val.toString());
+            } catch ( NumberFormatException x ) {
                 values.add(new BigDecimal(1));
+                valuesChceck.add(getEmergencyResult(x));
             }
-            break;
-            case "π": {
-                values.add(new BigDecimal(Math.PI, rounding));
+        } else {
+            valuesChceck.add(value);
+            switch ( value ) {
+                case "∞": {
+                    values.add(new BigDecimal(1));
+                }
+                break;
+                case "π": {
+                    values.add(new BigDecimal(Math.PI, rounding));
+                }
+                break;
+                case "e": {
+                    values.add(new BigDecimal(Math.E, rounding));
+                }
+                break;
+                case "-∞": {
+                    values.add(new BigDecimal(-1));
+                }
+                break;
+                case "-π": {
+                    values.add(new BigDecimal(-Math.PI, rounding));
+                }
+                break;
+                case "-e": {
+                    values.add(new BigDecimal(-Math.E, rounding));
+                }
+                break;
+                default: {
+                    values.add(new BigDecimal(value, rounding));
+                }
+                break;
             }
-            break;
-            case "e": {
-                values.add(new BigDecimal(Math.E, rounding));
-            }
-            break;
-            case "-∞": {
-                values.add(new BigDecimal(-1));
-            }
-            break;
-            case "-π": {
-                values.add(new BigDecimal(-Math.PI, rounding));
-            }
-            break;
-            case "-e": {
-                values.add(new BigDecimal(-Math.E, rounding));
-            }
-            break;
-            default: {
-                values.add(new BigDecimal(value, rounding));
-            }
-            break;
         }
-
     }
 
     void addAction(String action) {
@@ -96,11 +106,10 @@ class Operations {
     }
 
     String calculate() {
-        if (values.size() >= 1) {
-            if (actions.size() < 1)
+        if (values.size() > 0) {
+            if (actions.size() < 1) {
                 return valuesChceck.get(0);
-
-            else {
+            } else {
                 String emergencyResult = "";
                 BigDecimal result = new BigDecimal(0);
                 while ( actions.size() >= 1 ) {
@@ -116,9 +125,9 @@ class Operations {
                             return String.valueOf(result);
                         }
                     } else {
-                        exceptions.add("√");
+                        exceptions.add(action);
                         if (val1.doubleValue() < 0)
-                            return "ERROR: You can't calculate a root from a negative number";
+                            return "ERROR: You can't calculate \"" + action + "\" from a negative number";
                     }
                     if (action.equals("/") && val2.equals(new BigDecimal(0))) {
                         return "ERROR: You can't devide by 0";
@@ -199,6 +208,19 @@ class Operations {
     }
 
     //Actions
+    private static BigDecimal factorial(BigDecimal a) throws NumberFormatException {
+        int num = a.intValue();
+        BigDecimal sum = new BigDecimal(1, rounding);
+        for ( int i = num ; i > 0 ; i-- )
+            try {
+                sum = sum.multiply(new BigDecimal(i), rounding);
+            } catch ( NumberFormatException x ) {
+                throw new NumberFormatException(POSITIVE_INFINITY);
+            }
+        System.out.println("action: ! at " + a.toString() + " with result: "+sum);
+        return sum;
+    }
+
     private static BigDecimal add(BigDecimal a, BigDecimal b) {
         return a.add(b, rounding);
     }
@@ -245,7 +267,11 @@ class Operations {
     private static BigDecimal getResult(String action, BigDecimal val1, BigDecimal val2) throws NumberFormatException {
         switch ( action ) {
             case "*":
-                return mult(val1, val2);
+                try {
+                    return mult(val1, val2);
+                } catch ( NumberFormatException x ) {
+                    throw new NumberFormatException(getEmergencyResult(x));
+                }
             case "/":
                 return div(val1, val2);
             case "+":
@@ -266,11 +292,11 @@ class Operations {
 
     private void submit(String action, BigDecimal result, int numberOfValues, String emergencyResult) {
         int index = actions.indexOf(action);
-        try {
+        if (numberOfValues == 2)
             System.out.print("action: " + action + " at " + valuesChceck.get(index) + " and " + valuesChceck.get(index + 1) + " with result: ");
-        } catch ( IndexOutOfBoundsException x ) {
+        else
             System.out.print("action: " + action + " at " + valuesChceck.get(index) + " with result: ");
-        }
+
         for ( int i = 0 ; i < numberOfValues ; i++ ) {
             values.remove(index);
             valuesChceck.remove(index);

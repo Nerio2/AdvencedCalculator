@@ -80,6 +80,12 @@ class CalculationLayer {
                         currentVal = sb.toString();
                     }
                     break;
+                    case "!": {
+                        if (!currentVal.equals("")) {
+                            currentVal+="!";
+                        }
+                    }
+                    break;
                     case "-":
                         if (currentVal.equals("")) {
                             currentVal = "-";
@@ -96,13 +102,14 @@ class CalculationLayer {
                         }
                     }
                     break;
+
                     case "√": {
                         if (!currentVal.equals("")) {
                             getOperations().addValue(currentVal);
                             currentVal = "";
                             getOperations().addAction("*");
                         }
-                        getOperations().addAction("√");
+                        getOperations().addAction(readData);
                     }
                     break;
                     case "(": {
