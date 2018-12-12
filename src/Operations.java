@@ -8,9 +8,13 @@ import java.util.List;
 class Operations {
     private static final String POSITIVE_INFINITY = "∞";
     private static final String NEGATIVE_INFINITY = "-∞";
-    private static BigDecimal NUMBER_INFINITY=new BigDecimal(1.0e+300);
+    private static final BigDecimal NUMBER_POSITIVE_INFINITY = new BigDecimal(1.0e+300);
+    private static final BigDecimal NUMBER_NEGATIVE_INFINITY = new BigDecimal(-1.0e+300);
+    private static final BigDecimal BIG_DECIMAL_1 = new BigDecimal(1);
+    private static final BigDecimal BIG_DECIMAL_0 = new BigDecimal(0);
 
-    private static final List<String> exceptions=new ArrayList<>(Arrays.asList("∞","-∞","e","-e","π","-π"));
+
+    private static final List<String> exceptions = new ArrayList<>(Arrays.asList("∞", "-∞", "e", "-e", "π", "-π"));
 
     private static int precision = 20;
     private static RoundingMode roundingMode = RoundingMode.HALF_DOWN;
@@ -41,21 +45,21 @@ class Operations {
     }
 
     void addValue(String value) {
-        boolean exception=!exceptions.contains(value);
+        boolean exception = !exceptions.contains(value);
         if (value.indexOf("!") == value.length() - 1 && exception) {
             try {
-                BigDecimal val = factorial(Integer.parseInt(value.substring(0, value.length() - 1)));
+                BigDecimal val = factorial(new BigDecimal(Integer.parseInt(value.substring(0, value.length() - 1))));
                 values.add(val);
                 valuesChceck.add(val.toString());
             } catch ( NumberFormatException x ) {
-                values.add(new BigDecimal(1));
+                values.add(BIG_DECIMAL_1);
                 valuesChceck.add(getEmergencyResult(x));
             }
         } else {
             valuesChceck.add(value);
             switch ( value ) {
                 case "∞": {
-                    values.add(new BigDecimal(1));
+                    values.add(BIG_DECIMAL_1);
                 }
                 break;
                 case "π": {
@@ -116,13 +120,13 @@ class Operations {
                 return valuesChceck.get(0);
             } else {
                 String emergencyResult = "";
-                BigDecimal result = new BigDecimal(0);
+                BigDecimal result = BIG_DECIMAL_0;
                 while ( actions.size() >= 1 ) {
                     List<String> exceptions = new ArrayList<>();
                     String action = getAction();
                     result = values.get(actions.indexOf(action));
                     BigDecimal val1 = values.get(actions.indexOf(action));
-                    BigDecimal val2 = new BigDecimal(0);
+                    BigDecimal val2 = BIG_DECIMAL_0;
                     if (!action.equals("√")) {
                         try {
                             val2 = values.get(actions.indexOf(action) + 1);
@@ -134,7 +138,7 @@ class Operations {
                         if (val1.doubleValue() < 0)
                             return "ERROR: You can't calculate \"" + action + "\" from a negative number";
                     }
-                    if (action.equals("/") && val2.equals(new BigDecimal(0))) {
+                    if (action.equals("/") && val2.equals(BIG_DECIMAL_0)) {
                         return "ERROR: You can't devide by 0";
                     }
                     try {
@@ -182,7 +186,7 @@ class Operations {
                         switch ( exception ) {
                             case "infinityValue": {
                                 if (emergencyResult.equals("0")) {
-                                    result = new BigDecimal(0);
+                                    result = BIG_DECIMAL_0;
                                     emergencyResult = "";
                                 } else if (!emergencyResult.contains("∞")) {
                                     if (result.doubleValue() > 0) emergencyResult = POSITIVE_INFINITY;
@@ -190,7 +194,7 @@ class Operations {
                                     else return "Invalid value";
                                 } else {
                                     if (emergencyResult.contains("-")) result = new BigDecimal(-1);
-                                    else result = new BigDecimal(1);
+                                    else result = BIG_DECIMAL_1;
                                 }
                             }
                             break;
@@ -213,14 +217,19 @@ class Operations {
     }
 
     //Actions
-    private static BigDecimal factorial(int a) throws NumberFormatException {
-        BigDecimal sum = new BigDecimal(1, rounding);
-        for ( int i = a ; i > 0 ; i-- ) {
-            sum = sum.multiply(new BigDecimal(i), rounding);
-            if (sum.compareTo(NUMBER_INFINITY) == 1)
+    private static BigDecimal factorial(BigDecimal a) throws NumberFormatException {
+        BigDecimal sum = new BigDecimal(a.doubleValue() < 0 ? -1 : 1, rounding);
+        System.out.println(sum.toString());
+        for ( BigDecimal i = a.compareTo(BIG_DECIMAL_0) > 0 ? a : a.negate() ; i.compareTo(BIG_DECIMAL_0) > 0 ; i = i.subtract(BIG_DECIMAL_1) ) {
+            System.out.println(sum.toString());
+            System.out.println(i.toString());
+            sum = sum.multiply(i, rounding);
+            if (sum.compareTo(NUMBER_POSITIVE_INFINITY) > 0 && a.doubleValue() > 0)
                 throw new NumberFormatException(POSITIVE_INFINITY);
+            else if (sum.compareTo(NUMBER_NEGATIVE_INFINITY) < 0 && a.doubleValue() < 0)
+                throw new NumberFormatException(NEGATIVE_INFINITY);
         }
-        System.out.println("action: ! at " + a + " with result: "+sum);
+        System.out.println("action: ! at " + a + " with result: " + sum);
         return sum;
     }
 
@@ -259,8 +268,8 @@ class Operations {
     }
 
     private static BigDecimal sqrt(BigDecimal a, BigDecimal b) {
-        if (b.equals(new BigDecimal(0))) return new BigDecimal(1);
-        return pow(a, div(new BigDecimal(1), b));
+        if (b.equals(BIG_DECIMAL_0)) return BIG_DECIMAL_1;
+        return pow(a, div(BIG_DECIMAL_1, b));
     }
 
     private static String getEmergencyResult(NumberFormatException x) {

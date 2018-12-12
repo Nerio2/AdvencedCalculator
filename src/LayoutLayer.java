@@ -9,11 +9,11 @@ import java.util.List;
 public class LayoutLayer extends JFrame implements KeyListener {
     private Input input;
     private CalculationLayer calculationLayer = new CalculationLayer();
-    static List<String> acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
+    static List<String> acceptedChars;
     LayoutLayer(){
         new LayoutLayer("standard");
     }
-    LayoutLayer(String type) {
+    private LayoutLayer(String type) {
         super("Calculator");
         addKeyListener(this);
         setFocusable(true);
@@ -24,6 +24,7 @@ public class LayoutLayer extends JFrame implements KeyListener {
 
         switch(type){
             case "standard":{
+                acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
                 String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞", "!"};
                 JPanel body = new JPanel(new BorderLayout());
                 JPanel top = new JPanel(new GridLayout());
