@@ -17,8 +17,8 @@
 //TODO: function chose: linear, quadratic and polynomial
 //TODO: linear function: 0=AX+BY+C or y=ax+b
 //TODO: quadratic function: y=ax^2+bx+c or y=a(x-p)^2+q
-//TODO: polynominal function: at first derive the general function equation like: y=ax^4+bx^3+cx+d
-//TODO: polynominal function: hash map of <Integer degree , Big Decimal coefficients>
+//TODO: polynomial: at first derive the general function equation like: y=ax^4+bx^3+cx+d
+//TODO: polynomial: hash map of <Integer degree , Big Decimal coefficients>
 
 import java.awt.*;
 

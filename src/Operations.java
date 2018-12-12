@@ -2,11 +2,15 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Operations {
     private static final String POSITIVE_INFINITY = "∞";
     private static final String NEGATIVE_INFINITY = "-∞";
+    private static BigDecimal NUMBER_INFINITY=new BigDecimal(1.0e+300);
+
+    private static final List<String> exceptions=new ArrayList<>(Arrays.asList("∞","-∞","e","-e","π","-π"));
 
     private static int precision = 20;
     private static RoundingMode roundingMode = RoundingMode.HALF_DOWN;
@@ -37,9 +41,10 @@ class Operations {
     }
 
     void addValue(String value) {
-        if (value.indexOf("!") == value.length() - 1) {
+        boolean exception=!exceptions.contains(value);
+        if (value.indexOf("!") == value.length() - 1 && exception) {
             try {
-                BigDecimal val = factorial(new BigDecimal(Integer.parseInt(value.substring(0, value.length() - 1))));
+                BigDecimal val = factorial(Integer.parseInt(value.substring(0, value.length() - 1)));
                 values.add(val);
                 valuesChceck.add(val.toString());
             } catch ( NumberFormatException x ) {
@@ -208,16 +213,14 @@ class Operations {
     }
 
     //Actions
-    private static BigDecimal factorial(BigDecimal a) throws NumberFormatException {
-        int num = a.intValue();
+    private static BigDecimal factorial(int a) throws NumberFormatException {
         BigDecimal sum = new BigDecimal(1, rounding);
-        for ( int i = num ; i > 0 ; i-- )
-            try {
-                sum = sum.multiply(new BigDecimal(i), rounding);
-            } catch ( NumberFormatException x ) {
+        for ( int i = a ; i > 0 ; i-- ) {
+            sum = sum.multiply(new BigDecimal(i), rounding);
+            if (sum.compareTo(NUMBER_INFINITY) == 1)
                 throw new NumberFormatException(POSITIVE_INFINITY);
-            }
-        System.out.println("action: ! at " + a.toString() + " with result: "+sum);
+        }
+        System.out.println("action: ! at " + a + " with result: "+sum);
         return sum;
     }
 

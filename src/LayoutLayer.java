@@ -9,37 +9,43 @@ import java.util.List;
 public class LayoutLayer extends JFrame implements KeyListener {
     private Input input;
     private CalculationLayer calculationLayer = new CalculationLayer();
-    private List<String> acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
-
-    LayoutLayer() {
+    static List<String> acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
+    LayoutLayer(){
+        new LayoutLayer("standard");
+    }
+    LayoutLayer(String type) {
         super("Calculator");
-        String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞", "!"};
         addKeyListener(this);
         setFocusable(true);
         pack();
-        JPanel body = new JPanel(new BorderLayout());
-        JPanel top = new JPanel(new GridLayout());
-        JPanel main = new JPanel(new GridLayout(5, 4));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setVisible(true);
-        setSize(350, 500);
 
-        input = new Input(this);                      //creating input and add to top layout
-        input.setSize(300, 100);
-        top.add(input);
+        switch(type){
+            case "standard":{
+                String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞", "!"};
+                JPanel body = new JPanel(new BorderLayout());
+                JPanel top = new JPanel(new GridLayout());
+                JPanel main = new JPanel(new GridLayout(5, 4));
+                setSize(350, 500);
+                input = new Input(this);                      //creating input and add to top layout
+                input.setSize(300, 100);
+                top.add(input);
+                List<Button> buttons = new ArrayList<>();      //button list
 
-        List<Button> buttons = new ArrayList<>();      //button list
-
-        for ( String txt : text ) {
-            buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
+                for ( String txt : text ) {
+                    buttons.add(new Button(txt, input, this));    //creating a buttons and put into list
+                }
+                for ( Button b : buttons ) {
+                    main.add(b);                //add to layout
+                }
+                body.add(top, BorderLayout.NORTH);
+                body.add(main, BorderLayout.CENTER);
+                getContentPane().add(body);
+            }
+            break;
         }
-        for ( Button b : buttons ) {
-            main.add(b);                //add to layout
-        }
-        body.add(top, BorderLayout.NORTH);
-        body.add(main, BorderLayout.CENTER);
-        getContentPane().add(body);
     }
 
     String calc(String value) {
@@ -159,7 +165,8 @@ class Input extends JTextField implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        if(!LayoutLayer.acceptedChars.contains(String.valueOf(e.getKeyChar())))
+            e.consume();
     }
 
     @Override

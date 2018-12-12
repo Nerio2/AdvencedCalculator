@@ -81,7 +81,7 @@ class CalculationLayer {
                     }
                     break;
                     case "!": {
-                        if (!currentVal.equals("")) {
+                        if (!currentVal.equals("") && currentVal.charAt(currentVal.length()-1)!='!') {
                             currentVal+="!";
                         }
                     }
