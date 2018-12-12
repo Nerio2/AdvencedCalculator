@@ -11,6 +11,14 @@
  * Testing results: all problems solved now
  */
 
+//TODO: where is checking of undefined values, like letters and if not on calculation layer move it there
+//TODO: split layoutLayer to functions and normal calculator
+//TODO: menu where you can chose type of calc (normal, functions, binary?)
+//TODO: function chose: linear, quadratic and polynomial
+//TODO: linear function: 0=AX+BY+C or y=ax+b
+//TODO: quadratic function: y=ax^2+bx+c or y=a(x-p)^2+q
+//TODO: polynominal function: at first derive the general function equation like: y=ax^4+bx^3+cx+d
+//TODO: polynominal function: hash map of <Integer degree , Big Decimal coefficients>
 
 import java.awt.*;
 
