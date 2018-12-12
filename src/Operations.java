@@ -219,10 +219,7 @@ class Operations {
     //Actions
     private static BigDecimal factorial(BigDecimal a) throws NumberFormatException {
         BigDecimal sum = new BigDecimal(a.doubleValue() < 0 ? -1 : 1, rounding);
-        System.out.println(sum.toString());
         for ( BigDecimal i = a.compareTo(BIG_DECIMAL_0) > 0 ? a : a.negate() ; i.compareTo(BIG_DECIMAL_0) > 0 ; i = i.subtract(BIG_DECIMAL_1) ) {
-            System.out.println(sum.toString());
-            System.out.println(i.toString());
             sum = sum.multiply(i, rounding);
             if (sum.compareTo(NUMBER_POSITIVE_INFINITY) > 0 && a.doubleValue() > 0)
                 throw new NumberFormatException(POSITIVE_INFINITY);
