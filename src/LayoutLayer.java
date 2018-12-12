@@ -10,9 +10,11 @@ public class LayoutLayer extends JFrame implements KeyListener {
     private Input input;
     private CalculationLayer calculationLayer = new CalculationLayer();
     static List<String> acceptedChars;
+
     LayoutLayer(){
         new LayoutLayer("standard");
     }
+
     private LayoutLayer(String type) {
         super("Calculator");
         addKeyListener(this);
