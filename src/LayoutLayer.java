@@ -9,10 +9,11 @@ import java.util.List;
 public class LayoutLayer extends JFrame implements KeyListener {
     private Input input;
     private CalculationLayer calculationLayer = new CalculationLayer();
-    static List<String> acceptedChars;
+    private static List<String> acceptedChars;
+    private static boolean checkChars=true;
 
-    LayoutLayer(){
-        new LayoutLayer("standard");
+    LayoutLayer() {
+        new LayoutLayer("file");
     }
 
     private LayoutLayer(String type) {
@@ -24,9 +25,9 @@ public class LayoutLayer extends JFrame implements KeyListener {
         setResizable(true);
         setVisible(true);
 
-        switch(type){
-            case "standard":{
-                acceptedChars=new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
+        switch ( type ) {
+            case "standard": {
+                acceptedChars = new ArrayList<>(Arrays.asList("e", "!", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-", "*", "/", "^", "(", ")"));
                 String[] text = {"<=", "AC", "π", "e", "(", "7", "8", "9", "/", ")", "4", "5", "6", "*", "√", "1", "2", "3", "-", "x^n", "x^2", "0", ",", "+", "=", "∞", "!"};
                 JPanel body = new JPanel(new BorderLayout());
                 JPanel top = new JPanel(new GridLayout());
@@ -45,6 +46,16 @@ public class LayoutLayer extends JFrame implements KeyListener {
                 }
                 body.add(top, BorderLayout.NORTH);
                 body.add(main, BorderLayout.CENTER);
+                getContentPane().add(body);
+            }
+            break;
+            case "file": {
+                checkChars=false;
+                setSize(300, 100);
+                input = new Input(this);
+                input.setText(".txt");
+                JPanel body = new JPanel(new BorderLayout());
+                body.add(input);
                 getContentPane().add(body);
             }
             break;
@@ -89,10 +100,17 @@ public class LayoutLayer extends JFrame implements KeyListener {
         input.setText(value);
     }
 
+    static boolean checkChar(char a){
+        if(checkChars){
+            return LayoutLayer.acceptedChars.contains(String.valueOf(a));
+        }else
+            return false;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
         String value = input.getText();
-        if(acceptedChars.contains(String.valueOf(e.getKeyChar()))) {
+        if (checkChar(e.getKeyChar())) {
             if (!value.equals("0"))
                 value += String.valueOf(e.getKeyChar());
             else
@@ -168,8 +186,10 @@ class Input extends JTextField implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        if(!LayoutLayer.acceptedChars.contains(String.valueOf(e.getKeyChar())))
+        if (LayoutLayer.checkChar(e.getKeyChar())) {
             e.consume();
+            System.out.println("cos");
+        }
     }
 
     @Override
