@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -109,49 +111,57 @@ public class LayoutLayer extends JFrame implements KeyListener {
     }
 }
 
-class Button extends JButton {
+class Button extends JButton implements ActionListener {
+    private String text;
+    private Input input;
+    private LayoutLayer app;
 
     Button(String text, Input input, LayoutLayer app) {
         super(text);
+        this.text=text;
+        this.input=input;
+        this.app=app;
         addKeyListener(app);
-        addActionListener(e -> {
-            String value = input.getText();
-            switch ( text ) {
-                case "<=": {
-                    if (value.length() > 1 && value.indexOf('-') == -1)
-                        value = value.substring(0, value.length() - 1);
-                    else if (value.length() > 2 && value.indexOf('-') != -1)
-                        value = value.substring(0, value.length() - 1);
-                    else value = "0";
-                }
-                break;
+        addActionListener(this);
 
-                case "AC": {
-                    value = "0";
-                }
-                break;
-                case "=": {
-                    value = app.calc(value);
-                }
-                break;
-                case "x^2": {
-                    value += "^2";
-                }
-                break;
-                case "x^n": {
-                    value += "^";
-                }
-                break;
-                default: {
-                    if (value.equals("0"))
-                        value = text;
-                    else
-                        value += text;
-                }
-                break;
+    }
+    public void actionPerformed(ActionEvent e){
+        String value = input.getText();
+        switch ( text ) {
+            case "<=": {
+                if (value.length() > 1 && value.indexOf('-') == -1)
+                    value = value.substring(0, value.length() - 1);
+                else if (value.length() > 2 && value.indexOf('-') != -1)
+                    value = value.substring(0, value.length() - 1);
+                else value = "0";
             }
-            input.setText(value);
-        });
+            break;
+
+            case "AC": {
+                value = "0";
+            }
+            break;
+            case "=": {
+                value = app.calc(value);
+            }
+            break;
+            case "x^2": {
+                value += "^2";
+            }
+            break;
+            case "x^n": {
+                value += "^";
+            }
+            break;
+            default: {
+                if (value.equals("0"))
+                    value = text;
+                else
+                    value += text;
+            }
+            break;
+        }
+        input.setText(value);
     }
 }
 
