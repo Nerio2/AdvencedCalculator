@@ -23,7 +23,5 @@
 import java.awt.*;
 
 class App {
-    public static void main(String[] args) {
-        EventQueue.invokeLater(LayoutLayer::new);
-    }
+    public static void main(String[] args) { EventQueue.invokeLater(LayoutLayer::new); }
 }

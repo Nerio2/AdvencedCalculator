@@ -18,7 +18,13 @@ class CalculationLayer {
     }
 
     private Operations getOperations(int degree) {
-        return operacje.get(degree);
+        try {
+            return operacje.get(degree);
+        }catch ( IndexOutOfBoundsException x ){
+            Operations op=new Operations();
+            op.addValue("0");
+            return op;
+        }
     }
 
     private void removeOperation(int degree) {
@@ -81,8 +87,8 @@ class CalculationLayer {
                     }
                     break;
                     case "!": {
-                        if (!currentVal.equals("") && currentVal.charAt(currentVal.length()-1)!='!') {
-                            currentVal+="!";
+                        if (!currentVal.equals("") && currentVal.charAt(currentVal.length() - 1) != '!') {
+                            currentVal += "!";
                         }
                     }
                     break;
@@ -142,8 +148,10 @@ class CalculationLayer {
                 if (currentVal.contains("ERROR"))
                     return currentVal;
             }
-            if (!currentVal.equals("") && !currentVal.contains("ERROR") && !currentVal.equals(")")) {
+            if (!currentVal.equals("") && !currentVal.contains("ERROR") && !currentVal.equals(")") && !currentVal.equals("-")) {
                 getOperations().addValue(currentVal);
+                currentVal = "";
+            } else {
                 currentVal = "";
             }
             while ( operationDegree >= 0 ) {
@@ -151,7 +159,7 @@ class CalculationLayer {
                     getOperations().addValue(currentVal);
                 operationDegree--;
                 currentVal = getOperations(operationDegree + 1).calculate();
-                if (currentVal.contains("ERROR")) break;
+                if (currentVal.contains("ERROR") || currentVal.contains("")) break;
                 removeOperation(operationDegree + 1);
             }
             resetOperations();
